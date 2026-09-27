@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Scorer interactivo de FLL BIOGLOW 2026-2027" />
+  <title>FLL BIOGLOW 2026-2027 · Scorer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">FIRST LEGO League · BIOGLOW 2026–2027</p>
+      <h1>Scorer de Robot Game</h1>
+      <p>Selecciona los logros de cada misión y lleva el marcador en tiempo real.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="scoreboard" aria-label="Marcador">
+      <div><span class="label">Puntuación total</span><strong id="total-score">0</strong><span class="unit">puntos</span></div>
+      <div class="score-actions"><button id="reset" class="button secondary">Reiniciar</button></div>
+    </section>
+
+    <section>
+      <div class="section-heading"><div><p class="eyebrow">Misiones</p><h2>Robot Game</h2></div><p class="hint">Marca cada condición conseguida.</p></div>
+      <div id="missions" class="mission-grid"></div>
+    </section>
+
+    <section class="precision-section">
+      <div class="section-heading"><div><p class="eyebrow">Sección independiente</p><h2>Fichas de precisión</h2></div><p class="hint">Elige cuántas fichas conservas.</p></div>
+      <div id="precision-options" class="precision-grid"></div>
+      <p class="precision-note">La puntuación de fichas ya incluye la penalización indicada.</p>
+    </section>
+
+    <section class="summary">
+      <h2>Resumen</h2>
+      <div class="summary-row"><span>Misiones</span><strong id="mission-total">0</strong></div>
+      <div class="summary-row"><span>Fichas de precisión</span><strong id="precision-total">0</strong></div>
+      <div class="summary-row total-row"><span>Total</span><strong id="summary-total">0</strong></div>
+    </section>
+  </main>
+  <footer>Scorer no oficial · Comprueba siempre el reglamento y las actualizaciones de FIRST.</footer>
+  <script src="app.js"></script>
+</body>
+</html>
