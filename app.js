@@ -1,26 +1,254 @@
 const missions = [
-  {name:'Drone Survey', items:[['El dron está completamente fuera del tapete',20],['Se voltea el mapa LiDAR',10]]},
-  {name:'Exploding Seeds', items:[['Se retira la primera semilla del fruto',10],['Se retira la segunda semilla del fruto',10],['Se retira la tercera semilla del fruto',10]]},
-  {name:'Flip the Rock', items:[['Se derriba la bandera de investigación',20],['La roca regresa a la zona de lanzamiento',10]]},
-  {name:'Lucky Leaves', items:[['Se retira la primera hoja y el saltamontes permanece en su sitio',10],['Se retira la segunda hoja y el saltamontes permanece en su sitio',20]]},
-  {name:'Reaching Roots', items:[['La raíz cruza parcialmente el límite',10],['La raíz está completamente extendida',20]]},
-  {name:'Leafcutter Frenzy', items:[['La hormiga vuelve al nido con el fragmento dentro',10],['La hormiga vuelve al nido con el segundo fragmento dentro',10]]},
-  {name:'Humongous Fungus', items:[['Se extiende el micelio',20],['Conexión con otro equipo (por conexión)',10]]},
-  {name:'Tangled', items:[['Se retira la enredadera y queda sobre el tapete',30]]},
-  {name:'Research Platform', items:[['Se eleva la plataforma',10],['Se despliega la cámara trampa',10],['Se retira la semilla',10]]},
-  {name:'Fragile Microhabitats', items:[['La araña permanece en su sitio',10],['El caracol permanece en su sitio',10]]},
-  {name:'Window to the Past', items:[['Se abre la cubierta de raíces y queda plana sobre el tapete',20]]},
-  {name:'Forest Elder', items:[['Se eleva el bastón / se sostiene el árbol viejo',20],['Se añade el lazo de soporte',10]]},
-  {name:'Keystone Species', items:[['Misión de acoplamiento: coloca el modelo en la posición indicada',0]], note:'Consulta el reglamento oficial para las condiciones y puntos de esta misión.'},
-  {name:'Seeds of Renewal', items:[['Usa las semillas obtenidas en misiones anteriores según la combinación indicada',0]], note:'Consulta el reglamento oficial para las combinaciones y puntos.'},
-  {name:'Biocentric Architecture', items:[['Construye o coloca el modelo según la condición sostenible indicada',0]], note:'Consulta el reglamento oficial para las condiciones y puntos.'}
+  {
+    title: 'Encuesta del dron',
+    english: 'Drone Survey',
+    variations: [
+      { label: 'El dron queda completamente fuera del tapete', points: 20 },
+      { label: 'Se gira o se voltea el mapa LiDAR para bonus', points: 10 },
+    ],
+  },
+  {
+    title: 'Semillas explosivas',
+    english: 'Exploding Seeds',
+    variations: [
+      { label: 'Se retira la primera semilla del casco', points: 10 },
+      { label: 'Se retira la segunda semilla del casco', points: 10 },
+      { label: 'Se retira la tercera semilla del casco', points: 10 },
+    ],
+  },
+  {
+    title: 'Gira la roca',
+    english: 'Flip the Rock',
+    variations: [
+      { label: 'Se derriba la bandera de investigación', points: 20 },
+      { label: 'La roca vuelve a la zona de inicio o posición válida', points: 10 },
+    ],
+  },
+  {
+    title: 'Hojas afortunadas',
+    english: 'Lucky Leaves',
+    variations: [
+      { label: 'Se retira la primera hoja y el saltamontes sigue en su sitio', points: 10 },
+      { label: 'Se retira la segunda hoja y el saltamontes sigue en su sitio', points: 20 },
+    ],
+  },
+  {
+    title: 'Raíces que alcanzan',
+    english: 'Reaching Roots',
+    variations: [
+      { label: 'La raíz cruza parcialmente el límite', points: 10 },
+      { label: 'La raíz queda completamente extendida', points: 20 },
+    ],
+  },
+  {
+    title: 'Frenesí de cortadores de hojas',
+    english: 'Leafcutter Frenzy',
+    variations: [
+      { label: 'La hormiga vuelve al nido con un fragmento dentro', points: 10 },
+      { label: 'La hormiga vuelve al nido con otro fragmento dentro', points: 10 },
+    ],
+  },
+  {
+    title: 'Hongo enorme',
+    english: 'Humongous Fungus',
+    variations: [
+      { label: 'Se extiende el micelio', points: 20 },
+      { label: 'Conexión con otro equipo', points: 10 },
+    ],
+  },
+  {
+    title: 'Enredado',
+    english: 'Tangled',
+    variations: [
+      { label: 'Se retira la enredadera y queda sobre el tapete', points: 30 },
+    ],
+  },
+  {
+    title: 'Plataforma de investigación',
+    english: 'Research Platform',
+    variations: [
+      { label: 'Se eleva la plataforma', points: 10 },
+      { label: 'Se despliega la cámara trampa', points: 10 },
+      { label: 'Se retira la semilla', points: 10 },
+    ],
+  },
+  {
+    title: 'Microhábitats frágiles',
+    english: 'Fragile Microhabitats',
+    variations: [
+      { label: 'La araña permanece en su sitio', points: 10 },
+      { label: 'El caracol permanece en su sitio', points: 10 },
+    ],
+  },
+  {
+    title: 'Ventana al pasado',
+    english: 'Window to the Past',
+    variations: [
+      { label: 'Se abre la cubierta de raíces y queda plana sobre el tapete', points: 20 },
+    ],
+  },
+  {
+    title: 'Anciano del bosque',
+    english: 'Forest Elder',
+    variations: [
+      { label: 'Se eleva el palo o soporte del árbol viejo', points: 20 },
+      { label: 'Se añade el lazo de soporte', points: 10 },
+    ],
+  },
+  {
+    title: 'Especie clave',
+    english: 'Keystone Species',
+    variations: [
+      { label: 'Verifica la misión en el reglamento oficial de FIRST', points: 0 },
+    ],
+    note: 'La misión 13 requiere confirmar la condición exacta y el valor de puntos según la versión oficial del reglamento.',
+  },
+  {
+    title: 'Semillas de renovación',
+    english: 'Seeds of Renewal',
+    variations: [
+      { label: 'Verifica la combinación exacta y la puntuación oficial', points: 0 },
+    ],
+    note: 'La misión 14 depende de las semillas y combinaciones obtenidas en misiones previas.',
+  },
+  {
+    title: 'Arquitectura biocéntrica',
+    english: 'Biocentric Architecture',
+    variations: [
+      { label: 'Revisa la construcción y colocación final según el reglamento', points: 0 },
+    ],
+    note: 'La misión 15 suele depender de la construcción final del modelo y la posición específica.',
+  },
 ];
-const precision = [{n:6,points:50,penalty:0},{n:5,points:50,penalty:0},{n:4,points:35,penalty:-15},{n:3,points:25,penalty:-25},{n:2,points:15,penalty:-35},{n:1,points:10,penalty:-40},{n:0,points:0,penalty:-50}];
-const state={mission:0,precision:0};
-const money=n=>n>0?`+${n}`:n;
-function renderMissions(){document.querySelector('#missions').innerHTML=missions.map((m,i)=>`<article class="mission-card" data-mission="${i}"><div class="mission-header"><div><span class="mission-number">MISIÓN ${i+1}</span><h3>${m.name}</h3></div><span class="max">${m.items.reduce((a,x)=>a+x[1],0)} pts</span></div><ul>${m.items.map((x,j)=>`<li><input type="checkbox" data-points="${x[1]}" data-mission="${i}" id="m${i}-${j}"><label for="m${i}-${j}">${x[0]} <b>(${money(x[1])})</b></label></li>`).join('')}</ul>${m.note?`<p class="precision-note">${m.note}</p>`:''}</article>`).join('');
- document.querySelectorAll('[data-mission]').forEach(el=>el.addEventListener('change',update));}
-function renderPrecision(){document.querySelector('#precision-options').innerHTML=precision.map((p,i)=>`<label class="precision-option ${i===0?'selected':''}"><input type="radio" name="precision" value="${i}" ${i===0?'checked':''}><strong>${p.n} fichas</strong><span>${p.points} puntos</span><em>${money(p.penalty)} restados</em></label>`).join('');document.querySelectorAll('input[name=precision]').forEach(r=>r.addEventListener('change',()=>{state.precision=+r.value;document.querySelectorAll('.precision-option').forEach((x,i)=>x.classList.toggle('selected',i===state.precision));update();}));}
-function update(){let mission=0;document.querySelectorAll('#missions input[type=checkbox]').forEach(x=>{if(x.checked)mission+=+x.dataset.points;});const p=precision[state.precision],total=mission+p.points+p.penalty;document.querySelector('#mission-total').textContent=mission;document.querySelector('#precision-total').textContent=p.points+p.penalty;document.querySelector('#total-score').textContent=total;document.querySelector('#summary-total').textContent=total;document.querySelectorAll('.mission-card').forEach(c=>c.classList.toggle('active',c.querySelector('input:checked')));}
-document.querySelector('#reset').addEventListener('click',()=>{document.querySelectorAll('#missions input').forEach(x=>x.checked=false);document.querySelector('input[name=precision]').checked=true;state.precision=0;document.querySelectorAll('.precision-option').forEach((x,i)=>x.classList.toggle('selected',i===0));update();});
-renderMissions();renderPrecision();update();
+
+const precisionTable = [
+  { fichas: 6, puntos: 50, penal: 0 },
+  { fichas: 5, puntos: 50, penal: 0 },
+  { fichas: 4, puntos: 35, penal: -15 },
+  { fichas: 3, puntos: 25, penal: -25 },
+  { fichas: 2, puntos: 15, penal: -35 },
+  { fichas: 1, puntos: 10, penal: -40 },
+  { fichas: 0, puntos: 0, penal: -50 },
+];
+
+const state = { precisionIndex: 0 };
+
+function formatSigned(value) {
+  return value > 0 ? `+${value}` : String(value);
+}
+
+function renderMissions() {
+  const container = document.getElementById('missions');
+
+  container.innerHTML = missions
+    .map((mission, missionIndex) => {
+      const maxPoints = mission.variations.reduce((sum, item) => sum + item.points, 0);
+
+      return `
+        <article class="mission-card" data-mission-index="${missionIndex}">
+          <div class="mission-top">
+            <div>
+              <span class="mission-number">Misión ${missionIndex + 1}</span>
+              <h3>${mission.title}</h3>
+              <span class="small-name">${mission.english}</span>
+            </div>
+            <span class="mission-max">Máx. ${maxPoints} pts</span>
+          </div>
+
+          <ul class="mission-list">
+            ${mission.variations
+              .map(
+                (variation, variationIndex) => `
+                  <li class="mission-item">
+                    <input
+                      type="checkbox"
+                      data-mission-index="${missionIndex}"
+                      data-variation-index="${variationIndex}"
+                      data-points="${variation.points}"
+                      id="mission-${missionIndex}-${variationIndex}"
+                    />
+                    <label for="mission-${missionIndex}-${variationIndex}">
+                      ${variation.label}
+                      <span class="points-tag"> (${formatSigned(variation.points)})</span>
+                    </label>
+                  </li>
+                `
+              )
+              .join('')}
+          </ul>
+
+          ${mission.note ? `<p class="mission-note">${mission.note}</p>` : ''}
+        </article>
+      `;
+    })
+    .join('');
+
+  document.querySelectorAll('#missions input[type="checkbox"]').forEach((checkbox) => {
+    checkbox.addEventListener('change', updateScore);
+  });
+}
+
+function renderPrecision() {
+  const container = document.getElementById('precision-options');
+
+  container.innerHTML = precisionTable
+    .map(
+      (option, index) => `
+        <label class="precision-option ${index === state.precisionIndex ? 'selected' : ''}">
+          <input type="radio" name="precision" value="${index}" ${index === state.precisionIndex ? 'checked' : ''} />
+          <strong>${option.fichas} fichas</strong>
+          <span>${option.puntos} puntos</span>
+          <em>${formatSigned(option.penal)} restados</em>
+        </label>
+      `
+    )
+    .join('');
+
+  document.querySelectorAll('input[name="precision"]').forEach((radio) => {
+    radio.addEventListener('change', () => {
+      state.precisionIndex = Number(radio.value);
+      renderPrecision();
+      updateScore();
+    });
+  });
+}
+
+function updateScore() {
+  let missionPoints = 0;
+
+  document.querySelectorAll('#missions input[type="checkbox"]').forEach((checkbox) => {
+    if (checkbox.checked) {
+      missionPoints += Number(checkbox.dataset.points || 0);
+    }
+  });
+
+  const precision = precisionTable[state.precisionIndex];
+  const precisionTotal = precision.puntos + precision.penal;
+  const total = missionPoints + precisionTotal;
+
+  document.getElementById('mission-total').textContent = missionPoints;
+  document.getElementById('precision-total').textContent = precisionTotal;
+  document.getElementById('total-score').textContent = total;
+  document.getElementById('summary-total').textContent = total;
+
+  document.querySelectorAll('.mission-card').forEach((card) => {
+    const hasCheckedItem = card.querySelector('input:checked');
+    card.classList.toggle('active', Boolean(hasCheckedItem));
+  });
+}
+
+function resetScore() {
+  document.querySelectorAll('#missions input[type="checkbox"]').forEach((checkbox) => {
+    checkbox.checked = false;
+  });
+
+  state.precisionIndex = 0;
+  renderPrecision();
+  updateScore();
+}
+
+document.getElementById('reset').addEventListener('click', resetScore);
+
+renderMissions();
+renderPrecision();
+updateScore();

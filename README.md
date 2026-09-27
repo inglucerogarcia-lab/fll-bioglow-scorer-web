@@ -1,13 +1,20 @@
 # FLL BIOGLOW Scorer
 
-Scorer web interactivo en español para el Robot Game de FIRST LEGO League BIOGLOW 2026–2027.
+Scorer web interactivo en español para la temporada BIOGLOW 2026-2027 de FIRST LEGO League.
 
-## Uso local
+## Cómo usarlo
 
-Abre `index.html` en el navegador. No requiere dependencias ni compilación.
+1. Abre `index.html` en tu navegador.
+2. Marca cada objetivo conseguido en cada misión.
+3. Selecciona el número de fichas que te quedan.
+4. El total se calcula automáticamente.
 
-## Publicar con GitHub Pages
+## Publicar en GitHub Pages
 
-En el repositorio: **Settings → Pages → Deploy from a branch → main → /(root)**. Después de guardar, GitHub mostrará la URL del sitio.
+- Ve a `Settings` del repositorio.
+- Entra en `Pages`.
+- Selecciona `Deploy from a branch`.
+- Usa la rama `main` y la carpeta raíz `/`.
+- Guarda y espera a que GitHub genere la URL.
 
-> Este es un scorer comunitario. Las misiones 13–15 aparecen como recordatorio porque sus condiciones y puntuaciones requieren confirmación del reglamento oficial. Verifica siempre el Challenge Guide y las actualizaciones de FIRST antes de competir.
+> Este proyecto está pensado como apoyo para llevar el marcador. Comprueba siempre el reglamento oficial y las últimas actualizaciones de FIRST LEGO League.
