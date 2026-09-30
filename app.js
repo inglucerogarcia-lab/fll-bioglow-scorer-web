@@ -131,10 +131,216 @@ const precisionTable = [
   { fichas: 0, puntos: 0, penal: -50 },
 ];
 
-const state = { precisionIndex: 0 };
+const state = {
+  precisionIndex: 0,
+  currentTeam: null,
+};
+
+let chart = null;
 
 function formatSigned(value) {
   return value > 0 ? `+${value}` : String(value);
+}
+
+function initializeStorage() {
+  if (!localStorage.getItem('fll_teams')) {
+    localStorage.setItem('fll_teams', JSON.stringify({}));
+  }
+}
+
+function getTeams() {
+  const teams = localStorage.getItem('fll_teams');
+  return teams ? JSON.parse(teams) : {};
+}
+
+function saveTeam(name, number, history = []) {
+  const teams = getTeams();
+  const key = number;
+  teams[key] = { name, number, history };
+  localStorage.setItem('fll_teams', JSON.stringify(teams));
+}
+
+function getTeamHistory(number) {
+  const teams = getTeams();
+  return teams[number]?.history || [];
+}
+
+function addScore(number, score) {
+  const teams = getTeams();
+  const team = teams[number];
+  if (team) {
+    const timestamp = new Date().toLocaleString('es-ES');
+    team.history.push({ score, timestamp });
+    saveTeam(team.name, number, team.history);
+  }
+}
+
+function registerTeam() {
+  const name = document.getElementById('nombre-equipo').value.trim();
+  const number = document.getElementById('numero-equipo').value.trim();
+
+  if (!name || !number) return;
+
+  saveTeam(name, number, []);
+  state.currentTeam = number;
+  displayTeamInfo();
+  closeModal();
+  showStatsPanel();
+  document.getElementById('nombre-equipo').value = '';
+  document.getElementById('numero-equipo').value = '';
+}
+
+function displayTeamInfo() {
+  const teams = getTeams();
+  const team = teams[state.currentTeam];
+
+  if (team) {
+    document.getElementById('team-name').textContent = team.name;
+    document.getElementById('team-number').textContent = `Equipo: ${team.number}`;
+    document.getElementById('team-info').classList.remove('hidden');
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal-registro').classList.add('hidden');
+}
+
+function openModal() {
+  document.getElementById('modal-registro').classList.remove('hidden');
+}
+
+function changeTeam() {
+  state.currentTeam = null;
+  resetScore();
+  document.getElementById('team-info').classList.add('hidden');
+  document.getElementById('stats-panel').classList.add('hidden');
+  openModal();
+}
+
+function showStatsPanel() {
+  if (state.currentTeam) {
+    document.getElementById('stats-panel').classList.remove('hidden');
+    updateStats();
+  }
+}
+
+function updateStats() {
+  const history = getTeamHistory(state.currentTeam);
+
+  if (history.length === 0) {
+    document.getElementById('stat-intentos').textContent = '0';
+    document.getElementById('stat-mejor').textContent = '0';
+    document.getElementById('stat-promedio').textContent = '0';
+    document.getElementById('stat-anterior').textContent = '-';
+    document.getElementById('historial-tbody').innerHTML = '';
+    return;
+  }
+
+  const scores = history.map((h) => h.score);
+  const mejor = Math.max(...scores);
+  const promedio = (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(0);
+  const anterior = scores.length > 1 ? scores[scores.length - 2] : '-';
+
+  document.getElementById('stat-intentos').textContent = history.length;
+  document.getElementById('stat-mejor').textContent = mejor;
+  document.getElementById('stat-promedio').textContent = promedio;
+  document.getElementById('stat-anterior').textContent = anterior;
+
+  // Tabla de historial
+  const tbody = document.getElementById('historial-tbody');
+  tbody.innerHTML = history
+    .map((entry, index) => {
+      let cambio = '-';
+      let cambioClass = 'change-neutral';
+      if (index > 0) {
+        const diff = entry.score - history[index - 1].score;
+        if (diff > 0) {
+          cambio = `+${diff}`;
+          cambioClass = 'change-up';
+        } else if (diff < 0) {
+          cambio = `${diff}`;
+          cambioClass = 'change-down';
+        } else {
+          cambio = '=';
+        }
+      }
+      return `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${entry.timestamp}</td>
+          <td><strong>${entry.score}</strong></td>
+          <td class="${cambioClass}">${cambio}</td>
+        </tr>
+      `;
+    })
+    .join('');
+
+  // Gráfica
+  updateChart(scores, history.map((h) => h.timestamp.split(',')[0]));
+}
+
+function updateChart(scores, labels) {
+  const ctx = document.getElementById('score-chart').getContext('2d');
+
+  if (chart) {
+    chart.destroy();
+  }
+
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Puntaje',
+          data: scores,
+          borderColor: '#2a9d8f',
+          backgroundColor: 'rgba(42, 157, 143, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          pointRadius: 5,
+          pointBackgroundColor: '#d86d43',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          tension: 0.3,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            usePointStyle: true,
+            font: { weight: 'bold', size: 12 },
+          },
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { font: { size: 11 } },
+          grid: { color: '#e5ebf2' },
+        },
+        x: {
+          ticks: { font: { size: 10 } },
+          grid: { display: false },
+        },
+      },
+    },
+  });
+}
+
+function clearStats() {
+  if (confirm('¿Estás seguro de que deseas limpiar el historial del equipo?')) {
+    saveTeam(
+      getTeams()[state.currentTeam].name,
+      state.currentTeam,
+      []
+    );
+    updateStats();
+  }
 }
 
 function renderMissions() {
@@ -237,6 +443,19 @@ function updateScore() {
   });
 }
 
+function saveScore() {
+  if (!state.currentTeam) {
+    alert('Por favor, registra un equipo primero.');
+    return;
+  }
+
+  const score = Number(document.getElementById('total-score').textContent);
+  addScore(state.currentTeam, score);
+  resetScore();
+  updateStats();
+  alert(`Puntaje ${score} guardado para el equipo!`);
+}
+
 function resetScore() {
   document.querySelectorAll('#missions input[type="checkbox"]').forEach((checkbox) => {
     checkbox.checked = false;
@@ -247,8 +466,20 @@ function resetScore() {
   updateScore();
 }
 
+// Event listeners
+document.getElementById('form-registro').addEventListener('submit', (e) => {
+  e.preventDefault();
+  registerTeam();
+});
+
+document.getElementById('btn-cambiar-equipo').addEventListener('click', changeTeam);
+document.getElementById('btn-limpiar-estadisticas').addEventListener('click', clearStats);
+document.getElementById('save-score').addEventListener('click', saveScore);
 document.getElementById('reset').addEventListener('click', resetScore);
 
+// Inicializar
+initializeStorage();
 renderMissions();
 renderPrecision();
 updateScore();
+openModal();

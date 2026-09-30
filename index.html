@@ -22,6 +22,36 @@
     </header>
 
     <main class="container">
+      <!-- Modal de Registro -->
+      <div id="modal-registro" class="modal">
+        <div class="modal-content">
+          <h2>Registrar equipo</h2>
+          <form id="form-registro">
+            <div class="form-group">
+              <label for="nombre-equipo">Nombre del equipo</label>
+              <input type="text" id="nombre-equipo" placeholder="Ej: Team Dragons" required />
+            </div>
+            <div class="form-group">
+              <label for="numero-equipo">Número de equipo</label>
+              <input type="text" id="numero-equipo" placeholder="Ej: FLL-2026-001" required />
+            </div>
+            <button type="submit" class="button primary">Registrar</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Información del equipo -->
+      <section id="team-info" class="team-info hidden">
+        <div class="team-header">
+          <div>
+            <p class="eyebrow small">Equipo activo</p>
+            <h3 id="team-name"></h3>
+            <span id="team-number" class="team-number"></span>
+          </div>
+          <button id="btn-cambiar-equipo" class="button secondary small">Cambiar equipo</button>
+        </div>
+      </section>
+
       <section class="scoreboard" aria-label="Marcador principal">
         <div class="score-main">
           <span class="label">Puntuación total</span>
@@ -30,7 +60,10 @@
             <span class="unit">pts</span>
           </div>
         </div>
-        <button id="reset" class="button secondary" type="button">Reiniciar</button>
+        <div class="score-actions">
+          <button id="save-score" class="button primary" type="button">Guardar puntaje</button>
+          <button id="reset" class="button secondary" type="button">Reiniciar</button>
+        </div>
       </section>
 
       <section class="missions-panel">
@@ -70,12 +103,61 @@
           <strong id="summary-total">0</strong>
         </div>
       </section>
+
+      <!-- Estadísticas del equipo -->
+      <section id="stats-panel" class="stats-panel hidden">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow small">Desempeño</p>
+            <h2>Estadísticas del equipo</h2>
+          </div>
+          <button id="btn-limpiar-estadisticas" class="button secondary small">Limpiar historial</button>
+        </div>
+        <div class="stats-content">
+          <div class="stats-summary">
+            <div class="stat-card">
+              <span class="stat-label">Total de intentos</span>
+              <strong id="stat-intentos">0</strong>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Mejor puntaje</span>
+              <strong id="stat-mejor">0</strong>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Promedio</span>
+              <strong id="stat-promedio">0</strong>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Puntaje anterior</span>
+              <strong id="stat-anterior">-</strong>
+            </div>
+          </div>
+          <div class="stats-table-wrapper">
+            <table class="stats-table" id="historial-tabla">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Fecha y hora</th>
+                  <th>Puntaje</th>
+                  <th>Cambio</th>
+                </tr>
+              </thead>
+              <tbody id="historial-tbody">
+              </tbody>
+            </table>
+          </div>
+          <div id="chart-container" class="chart-container">
+            <canvas id="score-chart"></canvas>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer>
       Scorer de apoyo · Consulta siempre el reglamento oficial de FIRST LEGO League.
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
