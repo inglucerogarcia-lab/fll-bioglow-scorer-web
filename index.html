@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Scorer de FLL BIOGLOW 2026-2027 en español con misiones, variaciones y fichas de precisión"
+      content="Scorer de FLL BIOGLOW 2026-2027 en español con registro de equipos y estadísticas de avance"
     />
     <title>FLL BIOGLOW 2026-2027 · Scorer</title>
     <link rel="stylesheet" href="styles.css" />
@@ -16,7 +16,7 @@
         <p class="eyebrow">FIRST LEGO League</p>
         <h1>Scorer BIOGLOW 2026-2027</h1>
         <p class="subtitle">
-          Versionado en español para llevar el Robot Game y las fichas de precisión de forma clara.
+          Versionado en español para llevar el Robot Game, registrar equipos y ver estadísticas de avance.
         </p>
       </div>
     </header>
@@ -30,7 +30,52 @@
             <span class="unit">pts</span>
           </div>
         </div>
-        <button id="reset" class="button secondary" type="button">Reiniciar</button>
+        <div class="score-actions">
+          <button id="save-score" class="button primary" type="button">Guardar para equipo</button>
+          <button id="reset" class="button secondary" type="button">Reiniciar</button>
+        </div>
+      </section>
+
+      <section class="teams-panel" aria-label="Registro de equipos">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow small">Equipos</p>
+            <h2>Registro</h2>
+          </div>
+          <p class="hint">Añade equipos y guarda las pruebas de cada uno.</p>
+        </div>
+
+        <div class="team-registration-card">
+          <form id="team-form" class="team-form">
+            <div class="form-grid">
+              <label>
+                <span>Nombre del equipo</span>
+                <input id="team-name" name="teamName" type="text" placeholder="Ej. Bioglow Bots" required />
+              </label>
+              <label>
+                <span>Escuela / institución</span>
+                <input id="team-school" name="teamSchool" type="text" placeholder="Ej. IES Monteverde" />
+              </label>
+              <label>
+                <span>Categoría</span>
+                <input id="team-category" name="teamCategory" type="text" placeholder="Ej. Robot Design" />
+              </label>
+              <label>
+                <span>Mentor / responsable</span>
+                <input id="team-mentor" name="teamMentor" type="text" placeholder="Ej. Ana García" />
+              </label>
+            </div>
+            <div class="form-actions">
+              <button class="button primary" type="submit">Registrar equipo</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="team-list-header">
+          <h3>Equipos registrados</h3>
+          <p id="selected-team-name">Ningún equipo seleccionado</p>
+        </div>
+        <div id="team-list" class="team-list"></div>
       </section>
 
       <section class="missions-panel">
@@ -68,6 +113,55 @@
         <div class="summary-row total-row">
           <span>Total final</span>
           <strong id="summary-total">0</strong>
+        </div>
+      </section>
+
+      <section class="stats-panel" aria-label="Estadísticas de avance por equipo">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow small">Progreso</p>
+            <h2>Estadísticas de avance</h2>
+          </div>
+          <p class="hint">Comparación del rendimiento por equipo.</p>
+        </div>
+
+        <div class="stats-summary">
+          <div class="stat-box">
+            <span>Total equipos</span>
+            <strong id="total-teams">0</strong>
+          </div>
+          <div class="stat-box">
+            <span>Pruebas guardadas</span>
+            <strong id="total-tests">0</strong>
+          </div>
+          <div class="stat-box">
+            <span>Mejor puntaje</span>
+            <strong id="best-score">0</strong>
+          </div>
+          <div class="stat-box">
+            <span>Promedio</span>
+            <strong id="average-score">0</strong>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="stats-table">
+            <thead>
+              <tr>
+                <th>Equipo</th>
+                <th>Escuela</th>
+                <th>Pruebas</th>
+                <th>Mejor</th>
+                <th>Promedio</th>
+                <th>Avance</th>
+              </tr>
+            </thead>
+            <tbody id="team-stats-table-body">
+              <tr>
+                <td colspan="6" class="empty-row">No hay equipos registrados todavía.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
     </main>

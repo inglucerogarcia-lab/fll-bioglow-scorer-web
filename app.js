@@ -131,10 +131,50 @@ const precisionTable = [
   { fichas: 0, puntos: 0, penal: -50 },
 ];
 
-const state = { precisionIndex: 0 };
+const STORAGE_KEY = 'fllBioglowTeams';
+const maxPossibleScore = missions.reduce((sum, mission) => {
+  return sum + mission.variations.reduce((missionSum, variation) => missionSum + variation.points, 0);
+}, 0) + 50;
+
+const state = {
+  precisionIndex: 0,
+  teams: loadTeams(),
+  selectedTeamId: null,
+};
 
 function formatSigned(value) {
   return value > 0 ? `+${value}` : String(value);
+}
+
+function loadTeams() {
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    const parsed = stored ? JSON.parse(stored) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.warn('No se pudieron cargar los equipos guardados.', error);
+    return [];
+  }
+}
+
+function saveTeams() {
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state.teams));
+}
+
+function getCurrentScoreBreakdown() {
+  let missionPoints = 0;
+
+  document.querySelectorAll('#missions input[type="checkbox"]').forEach((checkbox) => {
+    if (checkbox.checked) {
+      missionPoints += Number(checkbox.dataset.points || 0);
+    }
+  });
+
+  const precision = precisionTable[state.precisionIndex];
+  const precisionTotal = precision.puntos + precision.penal;
+  const total = missionPoints + precisionTotal;
+
+  return { missionPoints, precisionTotal, total };
 }
 
 function renderMissions() {
@@ -214,17 +254,7 @@ function renderPrecision() {
 }
 
 function updateScore() {
-  let missionPoints = 0;
-
-  document.querySelectorAll('#missions input[type="checkbox"]').forEach((checkbox) => {
-    if (checkbox.checked) {
-      missionPoints += Number(checkbox.dataset.points || 0);
-    }
-  });
-
-  const precision = precisionTable[state.precisionIndex];
-  const precisionTotal = precision.puntos + precision.penal;
-  const total = missionPoints + precisionTotal;
+  const { missionPoints, precisionTotal, total } = getCurrentScoreBreakdown();
 
   document.getElementById('mission-total').textContent = missionPoints;
   document.getElementById('precision-total').textContent = precisionTotal;
@@ -247,8 +277,216 @@ function resetScore() {
   updateScore();
 }
 
-document.getElementById('reset').addEventListener('click', resetScore);
+function getTeamStats(team) {
+  const tests = Array.isArray(team.tests) ? team.tests : [];
+
+  if (!tests.length) {
+    return { tests: 0, best: 0, average: 0, last: 0, progress: 0 };
+  }
+
+  const values = tests.map((entry) => Number(entry.score || 0));
+  const best = Math.max(...values);
+  const average = Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
+  const last = values[values.length - 1];
+  const progress = Math.min(Math.round((last / maxPossibleScore) * 100), 100);
+
+  return { tests: tests.length, best, average, last, progress };
+}
+
+function updateSelectedTeamName() {
+  const selected = state.teams.find((team) => team.id === state.selectedTeamId) || null;
+  const label = selected ? `${selected.name} · ${selected.school || 'Sin escuela'}` : 'Ningún equipo seleccionado';
+  document.getElementById('selected-team-name').textContent = label;
+}
+
+function renderTeams() {
+  const container = document.getElementById('team-list');
+
+  if (!state.teams.length) {
+    container.innerHTML = '<p class="empty-state">Aún no hay equipos registrados. Añade el primero arriba.</p>';
+    updateSelectedTeamName();
+    renderStats();
+    return;
+  }
+
+  container.innerHTML = state.teams
+    .map((team) => {
+      const stats = getTeamStats(team);
+      const isSelected = team.id === state.selectedTeamId;
+      return `
+        <article class="team-card ${isSelected ? 'selected' : ''}" data-team-id="${team.id}">
+          <h4>${team.name}</h4>
+          <p class="team-meta">
+            ${team.school || 'Sin escuela'}<br />
+            ${team.category || 'Sin categoría'}<br />
+            ${team.mentor || 'Sin mentor'}
+          </p>
+          <div class="team-stats-mini">
+            <span>Pruebas: ${stats.tests}</span>
+            <span>Mejor: ${stats.best}</span>
+          </div>
+          <div class="team-stats-mini">
+            <span>Promedio: ${stats.average}</span>
+            <span>Avance: ${stats.progress}%</span>
+          </div>
+          <div class="team-card-actions">
+            <button class="button primary select-team" data-team-id="${team.id}" type="button">${isSelected ? 'Seleccionado' : 'Seleccionar'}</button>
+            <button class="button ghost danger delete-team" data-team-id="${team.id}" type="button">Eliminar</button>
+          </div>
+        </article>
+      `;
+    })
+    .join('');
+
+  document.querySelectorAll('.select-team').forEach((button) => {
+    button.addEventListener('click', () => {
+      const id = button.dataset.teamId;
+      state.selectedTeamId = id;
+      updateSelectedTeamName();
+      renderTeams();
+    });
+  });
+
+  document.querySelectorAll('.delete-team').forEach((button) => {
+    button.addEventListener('click', () => {
+      const id = button.dataset.teamId;
+      state.teams = state.teams.filter((team) => team.id !== id);
+      if (state.selectedTeamId === id) {
+        state.selectedTeamId = state.teams[0]?.id || null;
+      }
+      saveTeams();
+      renderTeams();
+    });
+  });
+
+  updateSelectedTeamName();
+  renderStats();
+}
+
+function renderStats() {
+  const totalTeams = state.teams.length;
+  const totalTests = state.teams.reduce((sum, team) => sum + (Array.isArray(team.tests) ? team.tests.length : 0), 0);
+  const bestScore = state.teams.reduce((max, team) => {
+    const teamBest = getTeamStats(team).best;
+    return Math.max(max, teamBest);
+  }, 0);
+
+  const averageScore = totalTeams > 0
+    ? Math.round(
+        state.teams.reduce((sum, team) => {
+          const teamAverage = getTeamStats(team).average;
+          return sum + teamAverage;
+        }, 0) / totalTeams
+      )
+    : 0;
+
+  document.getElementById('total-teams').textContent = totalTeams;
+  document.getElementById('total-tests').textContent = totalTests;
+  document.getElementById('best-score').textContent = bestScore;
+  document.getElementById('average-score').textContent = averageScore;
+
+  const tableBody = document.getElementById('team-stats-table-body');
+
+  if (!state.teams.length) {
+    tableBody.innerHTML = '<tr><td colspan="6" class="empty-row">No hay equipos registrados todavía.</td></tr>';
+    return;
+  }
+
+  const sortedTeams = [...state.teams].sort((a, b) => getTeamStats(b).best - getTeamStats(a).best);
+
+  tableBody.innerHTML = sortedTeams
+    .map((team) => {
+      const stats = getTeamStats(team);
+      return `
+        <tr>
+          <td>${team.name}</td>
+          <td>${team.school || 'Sin escuela'}</td>
+          <td>${stats.tests}</td>
+          <td>${stats.best}</td>
+          <td>${stats.average}</td>
+          <td><span class="progress-pill">${stats.progress}%</span></td>
+        </tr>
+      `;
+    })
+    .join('');
+}
+
+function registerTeam(event) {
+  event.preventDefault();
+
+  const form = event.currentTarget;
+  const name = document.getElementById('team-name').value.trim();
+  const school = document.getElementById('team-school').value.trim();
+  const category = document.getElementById('team-category').value.trim();
+  const mentor = document.getElementById('team-mentor').value.trim();
+
+  if (!name) {
+    document.getElementById('team-name').focus();
+    return;
+  }
+
+  const team = {
+    id: `team-${Date.now()}`,
+    name,
+    school,
+    category,
+    mentor,
+    tests: [],
+  };
+
+  state.teams.push(team);
+  state.selectedTeamId = team.id;
+  saveTeams();
+  form.reset();
+  renderTeams();
+}
+
+function saveCurrentScoreForSelectedTeam() {
+  const selectedTeam = state.teams.find((team) => team.id === state.selectedTeamId);
+
+  if (!selectedTeam) {
+    alert('Primero registra y selecciona un equipo para guardar la prueba.');
+    return;
+  }
+
+  const { total } = getCurrentScoreBreakdown();
+  const testEntry = {
+    id: `score-${Date.now()}`,
+    score: total,
+    date: new Date().toISOString(),
+    label: `Prueba ${selectedTeam.tests.length + 1}`,
+  };
+
+  selectedTeam.tests.push(testEntry);
+  saveTeams();
+  renderTeams();
+  updateScore();
+}
+
+function bindEvents() {
+  document.getElementById('team-form').addEventListener('submit', registerTeam);
+  document.getElementById('save-score').addEventListener('click', saveCurrentScoreForSelectedTeam);
+  document.getElementById('reset').addEventListener('click', resetScore);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (state.teams.length && !state.selectedTeamId) {
+    state.selectedTeamId = state.teams[0].id;
+  }
+
+  renderMissions();
+  renderPrecision();
+  renderTeams();
+  bindEvents();
+  updateScore();
+});
 
 renderMissions();
 renderPrecision();
+renderTeams();
+bindEvents();
 updateScore();
+
+if (state.teams.length && !state.selectedTeamId) {
+  state.selectedTeamId = state.teams[0].id;
+}
