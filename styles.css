@@ -8,6 +8,7 @@
   --primary-dark: #113a4d;
   --accent: #d86d43;
   --success: #2a9d8f;
+  --success-dark: #1f6b5f;
   --warning: #fff7ef;
   --shadow: 0 12px 28px rgba(19, 41, 61, 0.12);
 }
@@ -38,7 +39,7 @@ input {
 }
 
 .hero {
-  background: linear-gradient(135deg, #0f2d45 0%, #1d6d82 100%);
+  background: linear-gradient(135deg, #1f6b5f 0%, #2a9d8f 100%);
   color: white;
   padding: 44px 20px 88px;
 }
@@ -153,7 +154,7 @@ input {
 }
 
 .button.primary {
-  background: var(--primary);
+  background: var(--success);
   color: white;
   width: 100%;
 }
