@@ -344,8 +344,14 @@ function renderMissions() {
     .map((mission, missionIndex) => {
       const maxPoints = mission.variations.reduce((sum, item) => sum + item.points, 0);
 
+      // For the first mission, use the repository image with escaped space (%20)
+      const heroImg = missionIndex === 0
+        ? `<img src="MISION%201.png" alt="Misión 1" class="mission-hero" onerror="this.style.display='none'; console.warn('Imagen no encontrada:', this.src)" />`
+        : '';
+
       return `
         <article class="mission-card" data-mission-index="${missionIndex}">
+          ${heroImg}
           <div class="mission-top">
             <div>
               <span class="mission-number">Misión ${missionIndex + 1}</span>
